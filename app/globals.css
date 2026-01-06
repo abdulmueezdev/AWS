@@ -1,26 +1,26 @@
 @import "tailwindcss";
+@config "../tailwind.config.ts";
+
+/*
+  The default theme settings are now handled via the tailwind.config.ts file 
+  linked above. Global styles can be added here.
+*/
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Default background (Light mode) */
+  --background: #FFFFFF;
+  --foreground: #252F3E; /* AWS Dark Slate */
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+.dark {
+  /* Default background (Dark mode) */
+  --background: #1E202C; /* Navy Purple */
+  --foreground: #F4F5F7;
 }
 
 body {
-  background: var(--background);
+  background-color: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  /* Ensure transitions for theme plotting */
+  transition: background-color 0.3s ease, color 0.3s ease;
 }

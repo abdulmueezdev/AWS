@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RSS Feed Test - AWS Cloud Club at NUCES</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        h1 {
+            color: #252F3E;
+            text-align: center;
+        }
+        #output {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            min-height: 200px;
+        }
+        .loading {
+            text-align: center;
+            color: #666;
+            font-size: 18px;
+        }
+        .error {
+            color: #ff0000;
+            font-weight: bold;
+            padding: 20px;
+            background: #ffe0e0;
+            border-radius: 4px;
+        }
+        .no-events {
+            color: #333;
+            font-size: 20px;
+            font-weight: bold;
+            text-align: center;
+            padding: 40px 20px;
+        }
+        ul {
+            list-style: none;
+            padding: 0;
+        }
+        li {
+            background: #f9f9f9;
+            margin: 15px 0;
+            padding: 15px;
+            border-left: 4px solid #FF9900;
+            border-radius: 4px;
+        }
+        li h3 {
+            margin: 0 0 8px 0;
+            color: #252F3E;
+        }
+        li p {
+            margin: 5px 0;
+            color: #666;
+        }
+        li a {
+            display: inline-block;
+            margin-top: 10px;
+            padding: 8px 16px;
+            background: #FF9900;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+        li a:hover {
+            background: #e68a00;
+        }
+        .console-note {
+            background: #fff3cd;
+            color: #856404;
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <h1>RSS Feed Test - AWS Cloud Club at NUCES</h1>
+    
+    <div class="console-note">
+        📋 <strong>Open your browser DevTools (F12)</strong> and check the Console tab to see the full JSON response!
+    </div>
+    
+    <div id="output">
+        <p class="loading">Loading events from Meetup RSS feed...</p>
+    </div>
+
+    <script>
+        // RSS Feed URL using rss2json API
+        const RSS_API_URL = "https://api.rss2json.com/v1/api.json?rss_url=https://www.meetup.com/aws-cloud-club-at-nuces/events/rss/";
+        
+        const outputDiv = document.getElementById('output');
+
+        // Fetch the RSS feed
+        fetch(RSS_API_URL)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                // Log the full response to console for inspection
+                console.log('=== FULL RSS JSON RESPONSE ===');
+                console.log(data);
+                console.log('==============================');
+                
+                // Check if we got data successfully
+                if (data.status === 'ok') {
+                    const items = data.items || [];
+                    
+                    if (items.length > 0) {
+                        // Display events as a list
+                        let html = '<h2>✅ Events Found (' + items.length + ')</h2>';
+                        html += '<ul>';
+                        
+                        items.forEach((event, index) => {
+                            const eventDate = new Date(event.pubDate);
+                            const formattedDate = eventDate.toLocaleDateString(undefined, {
+                                year: 'numeric',
+                                month: 'long',
+                                day: 'numeric',
+                                hour: '2-digit',
+                                minute: '2-digit'
+                            });
+                            
+                            html += `
+                                <li>
+                                    <h3>${event.title}</h3>
+                                    <p><strong>Date:</strong> ${formattedDate}</p>
+                                    <p><strong>Published:</strong> ${event.pubDate}</p>
+                                    ${event.thumbnail ? `<p><strong>Thumbnail:</strong> ${event.thumbnail}</p>` : ''}
+                                    <a href="${event.link}" target="_blank">Register / View Details</a>
+                                </li>
+                            `;
+                        });
+                        
+                        html += '</ul>';
+                        outputDiv.innerHTML = html;
+                        
+                        // Log each event to console for detailed inspection
+                        console.log('=== INDIVIDUAL EVENTS ===');
+                        items.forEach((event, index) => {
+                            console.log(`Event ${index + 1}:`, event);
+                        });
+                        
+                    } else {
+                        // No events found
+                        outputDiv.innerHTML = `
+                            <div class="no-events">
+                                ⚠️ API Working, but NO Upcoming Events found in feed.
+                            </div>
+                            <p style="text-align: center; color: #666; margin-top: 20px;">
+                                The RSS feed is responding correctly, but there are currently no upcoming events listed.
+                            </p>
+                        `;
+                        console.log('⚠️ RSS feed is empty - no upcoming events');
+                    }
+                } else {
+                    // API returned an error status
+                    throw new Error(`API returned error status: ${data.status}`);
+                }
+            })
+            .catch(error => {
+                // Display error on screen
+                outputDiv.innerHTML = `
+                    <div class="error">
+                        ❌ Error fetching RSS feed:<br><br>
+                        ${error.message}
+                    </div>
+                    <p style="margin-top: 20px; color: #666;">
+                        Please check the browser console for more details.
+                    </p>
+                `;
+                
+                // Log error to console
+                console.error('❌ RSS FETCH ERROR:', error);
+            });
+    </script>
+</body>
+</html>
