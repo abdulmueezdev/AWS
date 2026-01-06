@@ -226,7 +226,7 @@ const Events = () => {
                             rel="noopener noreferrer"
                             className="inline-flex items-center gap-2 px-8 py-3 rounded-full border-2 border-brand-dark dark:border-white text-brand-dark dark:text-white font-bold hover:bg-brand-dark hover:text-white dark:hover:bg-white dark:hover:text-navy-purple transition-all"
                         >
-                            View Full Event Archive
+                            View Past Events
                             <ExternalLink size={18} />
                         </a>
                     </div>
